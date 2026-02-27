@@ -3,6 +3,7 @@ import { useState, useCallback, useRef } from 'react';
 interface ClickerButtonProps {
   onProgress?: () => void;
   cooldown?: number; // in milliseconds
+  isPressed?: boolean; // Forced pressed state from parent
 }
 
 const ButtonSVG = ({ isPressed, style }: { isPressed: boolean, style?: React.CSSProperties }) => {
@@ -41,8 +42,9 @@ const ButtonSVG = ({ isPressed, style }: { isPressed: boolean, style?: React.CSS
   );
 };
 
-export const ClickerButton = ({ onProgress, cooldown = 100 }: ClickerButtonProps) => {
-  const [isPressed, setIsPressed] = useState(false);
+export const ClickerButton = ({ onProgress, cooldown = 100, isPressed: forcedPressed = false }: ClickerButtonProps) => {
+  const [localIsPressed, setLocalIsPressed] = useState(false);
+  const isPressed = forcedPressed || localIsPressed;
   const [isOnCooldown, setIsOnCooldown] = useState(false);
   const lastClickTime = useRef<number>(0);
 
@@ -51,14 +53,14 @@ export const ClickerButton = ({ onProgress, cooldown = 100 }: ClickerButtonProps
     if (now - lastClickTime.current < cooldown) return;
 
     lastClickTime.current = now;
-    setIsPressed(true);
+    setLocalIsPressed(true);
     setIsOnCooldown(true);
     
     if (onProgress) onProgress();
     
     // Switch back to "up" state after a short delay
     setTimeout(() => {
-      setIsPressed(false);
+      setLocalIsPressed(false);
     }, 100);
 
     // Remove cooldown state after specified time
@@ -71,9 +73,9 @@ export const ClickerButton = ({ onProgress, cooldown = 100 }: ClickerButtonProps
     <div className="clicker-container">
       <button 
         className={`clicker-button ${isOnCooldown ? 'cooldown' : ''}`} 
-        onMouseDown={() => !isOnCooldown && setIsPressed(true)}
-        onMouseUp={() => setIsPressed(false)}
-        onMouseLeave={() => setIsPressed(false)}
+        onMouseDown={() => !isOnCooldown && setLocalIsPressed(true)}
+        onMouseUp={() => setLocalIsPressed(false)}
+        onMouseLeave={() => setLocalIsPressed(false)}
         onClick={handleClick}
         disabled={isOnCooldown}
         aria-label="Action Button"
