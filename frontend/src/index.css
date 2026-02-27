@@ -381,6 +381,42 @@ h1 {
   background: #059669;
 }
 
+.btn-edit {
+  background: rgba(56, 189, 248, 0.1);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.btn-edit:hover {
+  background: rgba(56, 189, 248, 0.2);
+}
+
+.btn-delete {
+  background: rgba(246, 63, 84, 0.1);
+  color: var(--button-color);
+  border: 1px solid rgba(246, 63, 84, 0.2);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.btn-delete:hover {
+  background: rgba(246, 63, 84, 0.2);
+}
+
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: auto;
+}
+
+.card-secondary-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
 /* Goal Card */
 .goal-card {
   width: 300px;
