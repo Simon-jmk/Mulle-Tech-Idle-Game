@@ -6,13 +6,17 @@ export interface Goal {
   category: 'Nutrition' | 'Sleep';
   target: string;
   value: number;
+  completed: boolean;
+  completedAt?: string;
+  endDate?: string;
 }
 
 interface GoalCardProps {
   goal: Goal;
+  onComplete?: (id: string) => void;
 }
 
-export const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
+export const GoalCard: React.FC<GoalCardProps> = ({ goal, onComplete }) => {
   const getUnit = () => {
     if (goal.category === 'Nutrition') {
       return goal.target === 'calories' ? 'kcal' : 'g';
@@ -22,7 +26,7 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
   };
 
   return (
-    <div className="goal-card">
+    <div className={`goal-card ${goal.completed ? 'completed' : ''}`}>
       <div className="card-header">
         <h3 className="card-title">{goal.title}</h3>
         <span className={`category-tag tag-${goal.category.toLowerCase()}`}>
@@ -41,6 +45,14 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
           </span>
         </div>
       </div>
+      {!goal.completed && onComplete && (
+        <button 
+          className="btn btn-complete" 
+          onClick={() => onComplete(goal.id)}
+        >
+          Complete goal
+        </button>
+      )}
     </div>
   );
 };
