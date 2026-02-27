@@ -1,15 +1,49 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { ClickerButton } from './ClickerButton';
 import { useStreak } from './useStreak';
+import { HandIndexThumbFill } from 'react-bootstrap-icons';
 
 export const MainPage = () => {
   const [score, setScore] = useState(0);
+  const [isAutoClicking, setIsAutoClicking] = useState(false);
+  const [isAutoPressed, setIsAutoPressed] = useState(false);
   const { streakCount, streakBonus, simulateNextDay, simulateMissedDay } = useStreak();
 
   const baseScore = 1;
   const multiplier = 1.5 + streakBonus;
 
   const scorePerClick = baseScore * multiplier;
+  const clickCooldown = 200;
+  const autoClickDelay = 600; // Slower auto-click pace
+
+  useEffect(() => {
+    const autoClickExpiry = localStorage.getItem('autoClickExpiry');
+    if (!autoClickExpiry) {
+      const expiry = Date.now() + 24 * 60 * 60 * 1000;
+      localStorage.setItem('autoClickExpiry', expiry.toString());
+      setIsAutoClicking(true);
+    } else {
+      setIsAutoClicking(Date.now() < parseInt(autoClickExpiry, 10));
+    }
+  }, []);
+
+  useEffect(() => {
+    let intervalId: number;
+    if (isAutoClicking) {
+      intervalId = window.setInterval(() => {
+        const autoClickExpiry = localStorage.getItem('autoClickExpiry');
+        if (autoClickExpiry && Date.now() < parseInt(autoClickExpiry, 10)) {
+          setScore((prev) => prev + scorePerClick);
+          setIsAutoPressed(true);
+          setTimeout(() => setIsAutoPressed(false), 300);
+        } else {
+          setIsAutoClicking(false);
+          window.clearInterval(intervalId);
+        }
+      }, autoClickDelay);
+    }
+    return () => window.clearInterval(intervalId);
+  }, [isAutoClicking, scorePerClick, autoClickDelay]);
 
   const handleButtonClick = useCallback(() => {
     setScore((prev) => prev + scorePerClick);
@@ -34,7 +68,18 @@ export const MainPage = () => {
           <span className="multiplier-label">Score Multiplier</span>
         </div>
       </div>
-      <ClickerButton onProgress={handleButtonClick} cooldown={200} />
+      <div className="clicker-wrapper">
+        <ClickerButton 
+          onProgress={handleButtonClick} 
+          cooldown={clickCooldown} 
+          isPressed={isAutoPressed} 
+        />
+        {isAutoClicking && (
+          <div className={`auto-clicker-hand ${isAutoPressed ? 'pressing' : ''}`}>
+            <HandIndexThumbFill size={80} />
+          </div>
+        )}
+      </div>
 
       {/* Developer Tools for Testing Streak */}
       <div className="dev-tools" style={{ position: 'fixed', bottom: '80px', right: '20px', display: 'flex', flexDirection: 'column', gap: '0.5rem', background: 'rgba(0,0,0,0.5)', padding: '1rem', borderRadius: '8px', zIndex: 1000}}>
