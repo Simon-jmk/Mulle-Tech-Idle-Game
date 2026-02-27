@@ -1,0 +1,46 @@
+services:
+  db:
+    image: mariadb:11
+    container_name: IdleGameLoggerDB
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: IdleGameLogger
+      TZ: "Europe/Stockholm"
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./Database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - idle-game-network
+
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: IdleGameBackend
+    restart: unless-stopped
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Default=Server=db;Port=3306;Database=IdleGameLogger;User=root;Pwd=rootpassword
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - idle-game-network
+
+volumes:
+  db_data:
+
+networks:
+  idle-game-network:
+    driver: bridge
