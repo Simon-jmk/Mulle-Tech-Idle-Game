@@ -4,14 +4,15 @@ import type { Goal } from './GoalCard';
 interface GoalFormProps {
   onSave: (goal: Omit<Goal, 'id' | 'completed' | 'completedAt'>) => void;
   onCancel: () => void;
+  initialData?: Goal;
 }
 
-export const GoalForm: React.FC<GoalFormProps> = ({ onSave, onCancel }) => {
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState<'Nutrition' | 'Sleep' | ''>('');
-  const [target, setTarget] = useState('');
-  const [value, setValue] = useState<number | string>('');
-  const [endDate, setEndDate] = useState('');
+export const GoalForm: React.FC<GoalFormProps> = ({ onSave, onCancel, initialData }) => {
+  const [title, setTitle] = useState(initialData?.title || '');
+  const [category, setCategory] = useState<'Nutrition' | 'Sleep' | ''>(initialData?.category || '');
+  const [target, setTarget] = useState(initialData?.target || '');
+  const [value, setValue] = useState<number | string>(initialData?.value || '');
+  const [endDate, setEndDate] = useState(initialData?.endDate || '');
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newCategory = e.target.value as 'Nutrition' | 'Sleep';
@@ -48,7 +49,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({ onSave, onCancel }) => {
   return (
     <div className="modal-overlay">
       <form className="goal-form" onSubmit={handleSubmit}>
-        <h2 style={{ marginBottom: '1.5rem' }}>Create New Goal</h2>
+        <h2 style={{ marginBottom: '1.5rem' }}>{initialData ? 'Edit Goal' : 'Create New Goal'}</h2>
         
         <div className="form-group">
           <label>Title</label>
@@ -154,7 +155,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({ onSave, onCancel }) => {
             Cancel
           </button>
           <button type="submit" className="btn btn-primary" disabled={!category || !target}>
-            Create Goal
+            {initialData ? 'Update Goal' : 'Create Goal'}
           </button>
         </div>
       </form>

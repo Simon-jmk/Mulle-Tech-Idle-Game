@@ -9,6 +9,7 @@ export const GoalsPage: React.FC = () => {
     return saved ? JSON.parse(saved) : [];
   });
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
 
   useEffect(() => {
     localStorage.setItem('mulle_goals', JSON.stringify(goals));
@@ -64,12 +65,21 @@ export const GoalsPage: React.FC = () => {
   }, []);
 
   const handleSaveGoal = (goalData: Omit<Goal, 'id' | 'completed' | 'completedAt'>) => {
-    const newGoal: Goal = {
-      ...goalData,
-      id: crypto.randomUUID(),
-      completed: false,
-    };
-    setGoals([...goals, newGoal]);
+    if (editingGoal) {
+      setGoals(goals.map(g => 
+        g.id === editingGoal.id 
+          ? { ...editingGoal, ...goalData } 
+          : g
+      ));
+      setEditingGoal(null);
+    } else {
+      const newGoal: Goal = {
+        ...goalData,
+        id: crypto.randomUUID(),
+        completed: false,
+      };
+      setGoals([...goals, newGoal]);
+    }
     setIsFormOpen(false);
   };
 
@@ -79,6 +89,22 @@ export const GoalsPage: React.FC = () => {
         ? { ...goal, completed: true, completedAt: new Date().toISOString() } 
         : goal
     ));
+  };
+
+  const handleDeleteGoal = (id: string) => {
+    if (window.confirm('Are you sure you want to delete this goal?')) {
+      setGoals(goals.filter(goal => goal.id !== id));
+    }
+  };
+
+  const handleEditGoal = (goal: Goal) => {
+    setEditingGoal(goal);
+    setIsFormOpen(true);
+  };
+
+  const handleCancelForm = () => {
+    setIsFormOpen(false);
+    setEditingGoal(null);
   };
 
   const activeGoals = goals.filter(g => !g.completed);
@@ -101,7 +127,8 @@ export const GoalsPage: React.FC = () => {
       {isFormOpen && (
         <GoalForm 
           onSave={handleSaveGoal} 
-          onCancel={() => setIsFormOpen(false)} 
+          onCancel={handleCancelForm}
+          initialData={editingGoal || undefined}
         />
       )}
 
@@ -121,7 +148,9 @@ export const GoalsPage: React.FC = () => {
                   <GoalCard 
                     key={goal.id} 
                     goal={goal} 
-                    onComplete={handleCompleteGoal} 
+                    onComplete={handleCompleteGoal}
+                    onEdit={handleEditGoal}
+                    onDelete={handleDeleteGoal}
                   />
                 ))}
               </div>

@@ -14,9 +14,11 @@ export interface Goal {
 interface GoalCardProps {
   goal: Goal;
   onComplete?: (id: string) => void;
+  onEdit?: (goal: Goal) => void;
+  onDelete?: (id: string) => void;
 }
 
-export const GoalCard: React.FC<GoalCardProps> = ({ goal, onComplete }) => {
+export const GoalCard: React.FC<GoalCardProps> = ({ goal, onComplete, onEdit, onDelete }) => {
   const getUnit = () => {
     if (goal.category === 'Nutrition') {
       return goal.target === 'calories' ? 'kcal' : 'g';
@@ -45,13 +47,37 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, onComplete }) => {
           </span>
         </div>
       </div>
-      {!goal.completed && onComplete && (
-        <button 
-          className="btn btn-complete" 
-          onClick={() => onComplete(goal.id)}
-        >
-          Complete goal
-        </button>
+      {!goal.completed && (
+        <div className="card-actions">
+          {onComplete && (
+            <button 
+              className="btn btn-complete" 
+              onClick={() => onComplete(goal.id)}
+            >
+              Complete goal
+            </button>
+          )}
+          <div className="card-secondary-actions">
+            {onEdit && (
+              <button 
+                className="btn btn-edit" 
+                onClick={() => onEdit(goal)}
+                title="Edit Goal"
+              >
+                Edit
+              </button>
+            )}
+            {onDelete && (
+              <button 
+                className="btn btn-delete" 
+                onClick={() => onDelete(goal.id)}
+                title="Delete Goal"
+              >
+                Delete
+              </button>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );
