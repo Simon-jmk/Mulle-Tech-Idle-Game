@@ -1,6 +1,8 @@
 ﻿using Backend.Data;
 using Backend.Models;
+using Backend.DTO;
 using Microsoft.EntityFrameworkCore;
+using Backend.Services;
 namespace Backend.ServerAPI
 {
     public static class Endpoints
@@ -8,21 +10,23 @@ namespace Backend.ServerAPI
         public static void MapEndpoints(this WebApplication app)
         {
             // Goal Endpoints
-            app.MapPost("/set/goal/", (IdleLoggerDbContext db, UserGoal goal) =>
-             {
-
-             });
-
-            app.MapPut("/update/goal/", (IdleLoggerDbContext db,  UserGoal goal) =>
+            app.MapPost("/set/goal/", (IdleLoggerDbContext db, UserGoalDTO goal) =>
             {
+                return UserGoalServices.PostGoal(db, goal);
+            });
+
+            app.MapPut("/update/goal/", (IdleLoggerDbContext db,  UserGoalDTO goal) =>
+            {
+                return UserGoalServices.PutGoal(db, goal);
             });
 
             app.MapDelete("/delete/goal/{id}", (IdleLoggerDbContext db, ulong id) =>
             {
             });
             app.MapGet("/get/goals/{id}", (IdleLoggerDbContext db, ulong id) =>
-           {
-           });
+            {
+               return UserGoalServices.GetGoal(db, id);
+            });
 
             app.MapGet("/get/gamestate", (IdleLoggerDbContext db, GameState gameState) => 
             {
