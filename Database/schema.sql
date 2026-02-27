@@ -62,7 +62,7 @@ CREATE TABLE nutrition_logs (
 CREATE TABLE goals (
   id            INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id       INT UNSIGNED NOT NULL,
-  type          ENUM('sleep_hours', 'sleep_quality', 'calories', 'carbs_g', 'fat_g', 'protein_g') NOT NULL,
+  type          VARCHAR(255) NOT NULL,
   daily_target  INT UNSIGNED NOT NULL,
   current_value INT UNSIGNED NOT NULL DEFAULT 0,
   end_date      DATE NOT NULL,
