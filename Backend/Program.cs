@@ -1,4 +1,5 @@
 using Backend.Data;
+using Backend.ServerAPI;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend
@@ -9,8 +10,8 @@ namespace Backend
         {
             string[] corsUrl = [""];
             string server = "localhost";
-            string database = "db";
-            string user = "IdleGameLogger";
+            string database = "IdleGameLogger";
+            string user = "root";
             string password = "rootpassword";
             string connectionString = $"Server={server};Port=3306;Database={database};User={user};Pwd={password};";
 
@@ -50,7 +51,7 @@ namespace Backend
 
             app.UseAuthorization();
 
-            
+            app.MapEndpoints();
 
             app.Run();
         }
