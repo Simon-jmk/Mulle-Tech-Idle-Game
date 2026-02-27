@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { Goal } from './GoalCard';
 
 interface GoalFormProps {
-  onSave: (goal: Omit<Goal, 'id'>) => void;
+  onSave: (goal: Omit<Goal, 'id' | 'completed' | 'completedAt'>) => void;
   onCancel: () => void;
 }
 
@@ -11,6 +11,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({ onSave, onCancel }) => {
   const [category, setCategory] = useState<'Nutrition' | 'Sleep' | ''>('');
   const [target, setTarget] = useState('');
   const [value, setValue] = useState<number | string>('');
+  const [endDate, setEndDate] = useState('');
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newCategory = e.target.value as 'Nutrition' | 'Sleep';
@@ -33,6 +34,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({ onSave, onCancel }) => {
       category: category as 'Nutrition' | 'Sleep',
       target,
       value: Number(value),
+      endDate: endDate || undefined,
     });
   };
 
@@ -133,6 +135,19 @@ export const GoalForm: React.FC<GoalFormProps> = ({ onSave, onCancel }) => {
             </div>
           </div>
         )}
+
+        <div className="form-group">
+          <label>End Date (Optional)</label>
+          <input
+            type="date"
+            className="form-control"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+          <small style={{ color: '#666', marginTop: '0.25rem', display: 'block' }}>
+            If set, this goal will recreate itself daily until this date.
+          </small>
+        </div>
 
         <div className="form-actions">
           <button type="button" className="btn btn-secondary" onClick={onCancel}>
