@@ -101,9 +101,10 @@ CREATE TABLE score_log (
 
 -- Seed streak milestones
 INSERT INTO streak_milestones (streak_days, multiplier, description) VALUES
-(3,  1.25, '3 day streak'),
-(7,  1.50, '1 week streak'),
-(14, 2.00, '2 week streak'),
-(30, 3.00, '1 month streak'),
-(60, 4.00, '2 month streak'),
-(90, 5.00, '3 month streak');
+(3,  1.25, '1 day streak'),
+(3,  1.50, '3 day streak'),
+(7,  2.00, '1 week streak'),
+(14, 3.00, '2 week streak'),
+(30, 5.00, '1 month streak'),
+(60, 7.00, '2 month streak'),
+(90, 10.00, '3 month streak');
