@@ -209,6 +209,21 @@ h1 {
   letter-spacing: 0.1rem;
 }
 
+.multiplier-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.goal-bonus-label {
+  font-size: 0.7rem;
+  color: #10b981;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 .bottom-navbar {
   position: fixed;
   bottom: 0px;
