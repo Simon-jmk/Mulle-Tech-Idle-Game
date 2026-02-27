@@ -9,8 +9,17 @@ export const MainPage = () => {
   const [isAutoPressed, setIsAutoPressed] = useState(false);
   const { streakCount, streakBonus, simulateNextDay, simulateMissedDay } = useStreak();
 
+  const [goalBonus, setGoalBonus] = useState(0);
+
+  useEffect(() => {
+    const savedBonus = localStorage.getItem('mulle_goal_multiplier_bonus');
+    if (savedBonus) {
+      setGoalBonus(Number(savedBonus));
+    }
+  }, []);
+
   const baseScore = 1;
-  const multiplier = 1.5 + streakBonus;
+  const multiplier = 1.5 + streakBonus + goalBonus;
 
   const scorePerClick = baseScore * multiplier;
   const clickCooldown = 200;
@@ -65,7 +74,10 @@ export const MainPage = () => {
         </div>
         <div className="multiplier-display">
           <span className="multiplier-value">{scorePerClick.toFixed(1)}x</span>
-          <span className="multiplier-label">Score Multiplier</span>
+          <div className="multiplier-details">
+            <span className="multiplier-label">Score Multiplier</span>
+            {goalBonus > 0 && <span className="goal-bonus-label">+{goalBonus} from Goals</span>}
+          </div>
         </div>
       </div>
       <div className="clicker-wrapper">

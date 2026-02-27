@@ -89,6 +89,10 @@ export const GoalsPage: React.FC = () => {
         ? { ...goal, completed: true, completedAt: new Date().toISOString() } 
         : goal
     ));
+
+    // Increment goal multiplier bonus
+    const currentBonus = Number(localStorage.getItem('mulle_goal_multiplier_bonus') || '0');
+    localStorage.setItem('mulle_goal_multiplier_bonus', (currentBonus + 1).toString());
   };
 
   const handleDeleteGoal = (id: string) => {
