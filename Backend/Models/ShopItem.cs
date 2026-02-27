@@ -6,5 +6,7 @@
 		public string Name { get; set; } = null!;
 		public string? Description { get; set; }
 		public ulong Cost { get; set; }
+
+		public virtual ICollection<UserPurchase>? UserPurchases { get; set; }
 	}
 }

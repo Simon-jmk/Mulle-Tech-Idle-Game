@@ -10,5 +10,7 @@
 			sleep_logged, nutrition_logged, goal_completted, streak_bonus, passive_income, click
 		}
 		public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+		public virtual User? User { get; set; }
 	}
 }

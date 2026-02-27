@@ -6,5 +6,8 @@
 		public ulong UserId { get; set; }
 		public ulong ItemId { get; set; }
 		public DateTime PurchasedAt { get; set; } = DateTime.Now;
+
+		public User? User { get; set; }
+		public ShopItem? ShopItem { get; set; }
 	}
 }
