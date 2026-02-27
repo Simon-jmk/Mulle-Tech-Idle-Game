@@ -149,20 +149,6 @@ h1 {
   letter-spacing: 0.1rem;
 }
 
-/* .clicker-button.cooldown {
-  cursor: not-allowed;
-  filter: saturate(0.5);
-} */
-
-/* .clicker-button:hover {
-  transform: scale(var(--button-hover-scale));
-}
-
-.clicker-button:active {
-  transform: scale(var(--button-active-scale));
-} */
-/* Navigation */
-/* Bottom Navigation */
 .bottom-navbar {
   position: fixed;
   bottom: 0px;
@@ -173,7 +159,7 @@ h1 {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-bottom: env(safe-area-inset-bottom);
