@@ -16,6 +16,10 @@ export const MainPage = () => {
     if (savedBonus) {
       setGoalBonus(Number(savedBonus));
     }
+
+    const handleReset = () => setGoalBonus(0);
+    window.addEventListener('mulle_goal_bonus_reset', handleReset);
+    return () => window.removeEventListener('mulle_goal_bonus_reset', handleReset);
   }, []);
 
   const baseScore = 1;

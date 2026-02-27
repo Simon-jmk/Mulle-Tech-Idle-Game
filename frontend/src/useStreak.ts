@@ -45,6 +45,8 @@ export const useStreak = () => {
         setStreakCount(prev => prev + 1);
       } else if (diffDays > 1) {
         setStreakCount(1);
+        localStorage.setItem('mulle_goal_multiplier_bonus', '0');
+        window.dispatchEvent(new Event('mulle_goal_bonus_reset'));
       }
       
       return diffDays > 0 ? currentDateStr : prevDate;

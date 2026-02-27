@@ -33,12 +33,10 @@
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
   background: var(--bg-gradient);
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 #root {
@@ -187,10 +185,8 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: rgba(56, 189, 248, 0.1);
   padding: 0.5rem 1.5rem;
   border-radius: 2rem;
-  border: 1px solid rgba(56, 189, 248, 0.2);
   backdrop-filter: blur(4px);
 }
 

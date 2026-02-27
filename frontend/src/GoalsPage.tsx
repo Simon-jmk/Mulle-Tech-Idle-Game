@@ -2,14 +2,31 @@ import React, { useState, useEffect } from 'react';
 import type { Goal } from './GoalCard';
 import { GoalCard } from './GoalCard';
 import { GoalForm } from './GoalForm';
+import { apiService } from './apiService';
 
 export const GoalsPage: React.FC = () => {
-  const [goals, setGoals] = useState<Goal[]>(() => {
-    const saved = localStorage.getItem('mulle_goals');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [goals, setGoals] = useState<Goal[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchGoals = async () => {
+      try {
+        const data = await apiService.getGoals();
+        setGoals(data);
+      } catch (err) {
+        console.error("Failed to fetch goals:", err);
+        setError("Could not load goals from server. Showing local copies fallback.");
+        const saved = localStorage.getItem('mulle_goals');
+        if (saved) setGoals(JSON.parse(saved));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchGoals();
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('mulle_goals', JSON.stringify(goals));
@@ -64,40 +81,67 @@ export const GoalsPage: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleSaveGoal = (goalData: Omit<Goal, 'id' | 'completed' | 'completedAt'>) => {
-    if (editingGoal) {
-      setGoals(goals.map(g => 
-        g.id === editingGoal.id 
-          ? { ...editingGoal, ...goalData } 
-          : g
-      ));
+  const handleSaveGoal = async (goalData: Omit<Goal, 'id' | 'completed' | 'completedAt'>) => {
+    try {
+      if (editingGoal) {
+        setGoals(goals.map(g => 
+          g.id === editingGoal.id 
+            ? { ...editingGoal, ...goalData } 
+            : g
+        ));
+        await apiService.updateGoal(editingGoal.id, goalData);
+        setEditingGoal(null);
+      } else {
+        const newGoal = await apiService.createGoal(goalData);
+        setGoals([...goals, newGoal]);
+      }
+      setIsFormOpen(false);
+      setError(null);
+    } catch (err) {
+      console.error("Error saving goal:", err);
+      setError("Failed to save goal to server. Changes will only apply locally until retry.");
+      // Fallback local save anyway for offline UX context
+      if (editingGoal) {
+        setGoals(goals.map(g => g.id === editingGoal.id ? { ...editingGoal, ...goalData } : g));
+      } else {
+        setGoals([...goals, { ...goalData, id: crypto.randomUUID(), completed: false }]);
+      }
+      setIsFormOpen(false);
       setEditingGoal(null);
-    } else {
-      const newGoal: Goal = {
-        ...goalData,
-        id: crypto.randomUUID(),
-        completed: false,
-      };
-      setGoals([...goals, newGoal]);
     }
-    setIsFormOpen(false);
   };
 
-  const handleCompleteGoal = (id: string) => {
-    setGoals(goals.map(goal => 
-      goal.id === id 
-        ? { ...goal, completed: true, completedAt: new Date().toISOString() } 
-        : goal
-    ));
+  const handleCompleteGoal = async (id: string) => {
+    try {
+      const now = new Date().toISOString();
+      setGoals(goals.map(goal => 
+        goal.id === id 
+          ? { ...goal, completed: true, completedAt: now } 
+          : goal
+      ));
+      await apiService.updateGoal(id, { completed: true });
 
-    // Increment goal multiplier bonus
-    const currentBonus = Number(localStorage.getItem('mulle_goal_multiplier_bonus') || '0');
-    localStorage.setItem('mulle_goal_multiplier_bonus', (currentBonus + 1).toString());
+      // Increment goal multiplier bonus
+      const currentBonus = Number(localStorage.getItem('mulle_goal_multiplier_bonus') || '0');
+      localStorage.setItem('mulle_goal_multiplier_bonus', (currentBonus + 1).toString());
+      setError(null);
+    } catch (err) {
+      console.error("Error completing goal:", err);
+      setError("Failed to mark goal as complete on server. Check your connection.");
+    }
   };
 
-  const handleDeleteGoal = (id: string) => {
+  const handleDeleteGoal = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this goal?')) {
-      setGoals(goals.filter(goal => goal.id !== id));
+      try {
+        await apiService.deleteGoal(id);
+        setGoals(goals.filter(goal => goal.id !== id));
+        setError(null);
+      } catch (err) {
+        console.error("Error deleting goal:", err);
+        setError("Failed to delete goal on server. Removing locally.");
+        setGoals(goals.filter(goal => goal.id !== id));
+      }
     }
   };
 
@@ -114,6 +158,10 @@ export const GoalsPage: React.FC = () => {
   const activeGoals = goals.filter(g => !g.completed);
   const completedGoals = goals.filter(g => g.completed);
 
+  if (isLoading) {
+    return <div className="goals-page"><div className="goals-header"><h2>Loading Goals...</h2></div></div>;
+  }
+
   return (
     <div className="goals-page">
       <div className="goals-header">
@@ -128,6 +176,12 @@ export const GoalsPage: React.FC = () => {
         )}
       </div>
 
+      {error && (
+        <div style={{ padding: '10px', backgroundColor: '#ffebee', color: '#c62828', borderRadius: '4px', marginBottom: '15px' }}>
+          {error}
+        </div>
+      )}
+
       {isFormOpen && (
         <GoalForm 
           onSave={handleSaveGoal} 
@@ -141,6 +195,7 @@ export const GoalsPage: React.FC = () => {
           <p>You haven't added any goals yet. Click "Create goal" to get started.</p>
         </div>
       ) : (
+
         <>
           <section className="goals-section">
             <h2>Active Goals</h2>
