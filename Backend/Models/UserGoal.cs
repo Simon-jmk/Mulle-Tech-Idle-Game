@@ -6,10 +6,7 @@ namespace Backend.Models
 	{
 		public ulong Id { get; set; }
 		public ulong UserId { get; set; }
-		public enum Type
-		{
-			sleep_hours, sleep_quality, calories, carbs_g, fat_g, protein_g
-		}
+		public string Type { get; set; } = null!;
 		public SqlDecimal TargetValue { get; set; }
 		public SqlDecimal CurrentValue { get; set; }
 		public DateTime? CompletedAt { get; set; } = null;
